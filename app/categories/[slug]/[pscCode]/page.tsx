@@ -54,6 +54,7 @@ export default async function PscContractsPage({
   const groupLabel = PSC_GROUP_LABELS[groupCode] ?? groupCode;
 
   let data: ContractResponse;
+  let apiError: string | null = null;
   try {
     data = await postUSASpending<ContractResponse>(
       "/search/spending_by_award/",
@@ -81,8 +82,9 @@ export default async function PscContractsPage({
       },
       3600
     );
-  } catch {
-    notFound();
+  } catch (e) {
+    apiError = e instanceof Error ? e.message : "Unknown error";
+    data = { results: [], page_metadata: { page, hasNext: false } };
   }
 
   const contracts = data.results;
@@ -90,6 +92,11 @@ export default async function PscContractsPage({
 
   return (
     <div className="space-y-6">
+      {apiError && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          <strong>API error:</strong> {apiError}
+        </div>
+      )}
       {/* Breadcrumb */}
       <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
         <Link href={`/categories?fy=${fy}`} className="hover:underline">Spending Categories</Link>
