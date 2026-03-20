@@ -8,14 +8,12 @@ import { parseFY, fyDateRange } from "@/lib/fiscal-year";
 export default async function GeographyPage({ searchParams }: { searchParams: Promise<{ fy?: string }> }) {
   const { fy: fyParam } = await searchParams;
   const fy = parseFY(fyParam);
-  const { start, end } = fyDateRange(fy);
-
   const data = await postUSASpending<SpendingByGeographyResponse>(
     "/search/spending_by_geography/",
     {
       filters: {
         agencies: [{ type: "awarding", tier: "toptier", name: "Department of Defense" }],
-        time_period: [{ start_date: start, end_date: end }],
+        time_period: [fyDateRange(fy)],
       },
       geo_layer: "state",
       scope: "place_of_performance",

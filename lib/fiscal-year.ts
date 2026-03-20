@@ -8,10 +8,10 @@ export function parseFY(value: string | undefined): number {
   return DEFAULT_FISCAL_YEAR;
 }
 
-export function fyDateRange(fy: number): { start: string; end: string } {
+export function fyDateRange(fy: number): { start_date: string; end_date: string } {
   return {
-    start: `${fy - 1}-10-01`,
-    end: `${fy}-09-30`,
+    start_date: `${fy - 1}-10-01`,
+    end_date: `${fy}-09-30`,
   };
 }
 

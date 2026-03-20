@@ -10,8 +10,6 @@ export async function GET(req: NextRequest) {
   const sort = searchParams.get("sort") ?? "Award Amount";
   const order = (searchParams.get("order") ?? "desc") as "asc" | "desc";
   const fy = parseFY(searchParams.get("fy") ?? undefined);
-  const { start, end } = fyDateRange(fy);
-
   if (!q || q.length < 2) {
     return NextResponse.json({ results: [], page_metadata: { hasNext: false } });
   }
@@ -19,7 +17,7 @@ export async function GET(req: NextRequest) {
   const body = {
     filters: {
       agencies: [{ type: "awarding", tier: "toptier", name: "Department of Defense" }],
-      time_period: [{ start_date: start, end_date: end }],
+      time_period: [fyDateRange(fy)],
       award_type_codes: ["A", "B", "C", "D"],
       keywords: [q],
     },

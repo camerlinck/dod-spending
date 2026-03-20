@@ -7,13 +7,12 @@ import { formatCurrency } from "@/lib/usaspending/formatters";
 import { parseFY, fyDateRange } from "@/lib/fiscal-year";
 
 async function TopContractors({ fy }: { fy: number }) {
-  const { start, end } = fyDateRange(fy);
   const data = await postUSASpending<SpendingByCategoryResponse>(
     "/search/spending_by_category/recipient/",
     {
       filters: {
         agencies: [{ type: "awarding", tier: "toptier", name: "Department of Defense" }],
-        time_period: [{ start_date: start, end_date: end }],
+        time_period: [fyDateRange(fy)],
         award_type_codes: ["A", "B", "C", "D"],
       },
       limit: 50,
@@ -52,13 +51,12 @@ async function TopContractors({ fy }: { fy: number }) {
 }
 
 async function SpendingByIndustry({ fy }: { fy: number }) {
-  const { start, end } = fyDateRange(fy);
   const data = await postUSASpending<SpendingByCategoryResponse>(
     "/search/spending_by_category/naics/",
     {
       filters: {
         agencies: [{ type: "awarding", tier: "toptier", name: "Department of Defense" }],
-        time_period: [{ start_date: start, end_date: end }],
+        time_period: [fyDateRange(fy)],
         award_type_codes: ["A", "B", "C", "D"],
       },
       limit: 15,
