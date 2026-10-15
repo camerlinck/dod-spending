@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { SpendingTrendChart } from "@/components/charts/SpendingTrendChart";
-import { AgencyTreemap } from "@/components/charts/AgencyTreemap";
+import { SubAgencyBars } from "@/components/charts/SubAgencyBars";
+import { summarizeSubAgencies } from "@/lib/usaspending/sub-agencies";
 import { ObjectClassDonut } from "@/components/charts/ObjectClassDonut";
 import { getUSASpending, DOD_AGENCY_CODE } from "@/lib/usaspending/client";
 import type { AgencyBudgetaryResourcesResponse, SubAgencyResponse, ObjectClassResponse } from "@/lib/usaspending/types";
@@ -43,11 +44,10 @@ async function TrendSection({ fy }: { fy: number }) {
 
 async function AgencySection({ fy }: { fy: number }) {
   const data = await getUSASpending<SubAgencyResponse>(
-    `/agency/${DOD_AGENCY_CODE}/sub_agency/?fiscal_year=${fy}&limit=15`,
+    `/agency/${DOD_AGENCY_CODE}/sub_agency/?fiscal_year=${fy}&limit=100`,
     { revalidate: 14400 }
   );
-  const treemapData = data.results.filter((a) => a.total_obligations > 0).map((a) => ({ name: a.name, value: a.total_obligations }));
-  return <AgencyTreemap data={treemapData} />;
+  return <SubAgencyBars rows={summarizeSubAgencies(data.results)} />;
 }
 
 async function ObjectClassSection({ fy }: { fy: number }) {

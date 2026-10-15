@@ -15,7 +15,7 @@ export interface AgencyBudgetaryResourcesResponse {
 
 export interface SubAgency {
   name: string;
-  abbreviation: string;
+  abbreviation: string | null;
   total_obligations: number;
   transaction_obligated_amount: number;
   new_award_count: number;
