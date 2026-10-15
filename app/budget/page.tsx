@@ -59,7 +59,7 @@ export default async function BudgetPage() {
             <TableBody>
               {allYears.map((yr, i) => {
                 const prev = allYears[i + 1];
-                const delta = prev ? deltaPercent(yr.agency_total_obligated, prev.agency_total_obligated) : null;
+                const delta = (prev && deltaPercent(yr.agency_total_obligated, prev.agency_total_obligated)) ?? null;
                 return (
                   <TableRow key={yr.fiscal_year}>
                     <TableCell className="font-bold">FY{yr.fiscal_year}</TableCell>
