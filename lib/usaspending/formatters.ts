@@ -1,4 +1,5 @@
-export function formatCurrency(amount: number, compact = false): string {
+export function formatCurrency(amount: number | null, compact = false): string {
+  if (amount == null) return "—";
   if (compact) {
     if (Math.abs(amount) >= 1e12) return `$${(amount / 1e12).toFixed(2)}T`;
     if (Math.abs(amount) >= 1e9) return `$${(amount / 1e9).toFixed(1)}B`;
@@ -24,7 +25,8 @@ export function fiscalYearLabel(fy: number): string {
   return `FY${fy}`;
 }
 
-export function deltaPercent(current: number, previous: number): number {
+export function deltaPercent(current: number | null, previous: number | null): number | undefined {
+  if (current == null || previous == null) return undefined;
   if (!previous) return 0;
   return ((current - previous) / previous) * 100;
 }

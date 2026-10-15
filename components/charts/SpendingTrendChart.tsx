@@ -14,9 +14,9 @@ import { formatCurrency } from "@/lib/usaspending/formatters";
 
 interface DataPoint {
   year: string;
-  obligations: number;
-  outlays: number;
-  budget_authority: number;
+  obligations: number | null;
+  outlays: number | null;
+  budget_authority: number | null;
 }
 
 interface SpendingTrendChartProps {

@@ -1,6 +1,16 @@
-export const AVAILABLE_FISCAL_YEARS = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
-export const DEFAULT_FISCAL_YEAR = 2025;
-export const CURRENT_FISCAL_YEAR = 2026; // in-progress
+const FIRST_FISCAL_YEAR = 2017;
+
+// Federal FY N runs Oct 1 of N-1 through Sep 30 of N.
+export function fiscalYearForDate(date: Date): number {
+  return date.getMonth() >= 9 ? date.getFullYear() + 1 : date.getFullYear();
+}
+
+export const CURRENT_FISCAL_YEAR = fiscalYearForDate(new Date()); // in-progress
+export const DEFAULT_FISCAL_YEAR = CURRENT_FISCAL_YEAR - 1; // most recent completed
+export const AVAILABLE_FISCAL_YEARS = Array.from(
+  { length: CURRENT_FISCAL_YEAR - FIRST_FISCAL_YEAR + 1 },
+  (_, i) => FIRST_FISCAL_YEAR + i,
+);
 
 export function parseFY(value: string | undefined): number {
   const n = parseInt(value ?? "", 10);

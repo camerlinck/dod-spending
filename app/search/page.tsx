@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { DEFAULT_FISCAL_YEAR } from "@/lib/fiscal-year";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -62,6 +62,13 @@ function SortHeader({
   );
 }
 
+interface SearchResponse {
+  key: string;
+  results: ContractResult[];
+  hasNext: boolean;
+  error: string | null;
+}
+
 function SearchPageInner() {
   const urlSearchParams = useSearchParams();
   const fy = parseInt(urlSearchParams.get("fy") ?? String(DEFAULT_FISCAL_YEAR), 10);
@@ -70,12 +77,7 @@ function SearchPageInner() {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<SortField>("Award Amount");
   const [order, setOrder] = useState<"asc" | "desc">("desc");
-  const [results, setResults] = useState<ContractResult[]>([]);
-  const [hasNext, setHasNext] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [searched, setSearched] = useState(false);
-  const abortRef = useRef<AbortController | null>(null);
+  const [response, setResponse] = useState<SearchResponse | null>(null);
 
   // Debounce query
   useEffect(() => {
@@ -86,47 +88,46 @@ function SearchPageInner() {
     return () => clearTimeout(t);
   }, [query]);
 
-  const fetchResults = useCallback(async () => {
-    if (debouncedQuery.length < 2) {
-      setResults([]);
-      setSearched(false);
-      return;
-    }
-
-    abortRef.current?.abort();
-    abortRef.current = new AbortController();
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const params = new URLSearchParams({
-        q: debouncedQuery,
-        page: String(page),
-        sort,
-        order,
-        fy: String(fy),
-      });
-      const res = await fetch(`/api/search?${params}`, {
-        signal: abortRef.current.signal,
-      });
-      if (!res.ok) throw new Error("Search failed");
-      const data = await res.json();
-      setResults(data.results ?? []);
-      setHasNext(data.page_metadata?.hasNext ?? false);
-      setSearched(true);
-    } catch (e: unknown) {
-      if (e instanceof Error && e.name !== "AbortError") {
-        setError("Search failed. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [debouncedQuery, page, sort, order]);
+  // Identifies the request for the current inputs; null when the query is too short to search.
+  const requestKey =
+    debouncedQuery.length >= 2 ? JSON.stringify([debouncedQuery, page, sort, order, fy]) : null;
 
   useEffect(() => {
-    fetchResults();
-  }, [fetchResults]);
+    if (requestKey === null) return;
+    const controller = new AbortController();
+    const params = new URLSearchParams({
+      q: debouncedQuery,
+      page: String(page),
+      sort,
+      order,
+      fy: String(fy),
+    });
+    fetch(`/api/search?${params}`, { signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) throw new Error("Search failed");
+        return res.json();
+      })
+      .then((data) =>
+        setResponse({
+          key: requestKey,
+          results: data.results ?? [],
+          hasNext: data.page_metadata?.hasNext ?? false,
+          error: null,
+        })
+      )
+      .catch((e: unknown) => {
+        if (e instanceof Error && e.name === "AbortError") return;
+        setResponse({ key: requestKey, results: [], hasNext: false, error: "Search failed. Please try again." });
+      });
+    return () => controller.abort();
+  }, [requestKey, debouncedQuery, page, sort, order, fy]);
+
+  const current = requestKey !== null && response?.key === requestKey ? response : null;
+  const loading = requestKey !== null && current === null;
+  const results = current?.results ?? [];
+  const hasNext = current?.hasNext ?? false;
+  const error = current?.error ?? null;
+  const searched = current !== null && current.error === null;
 
   function handleSort(field: SortField) {
     if (field === sort) {

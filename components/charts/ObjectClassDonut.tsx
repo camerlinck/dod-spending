@@ -95,7 +95,7 @@ export function ObjectClassDonut({ data, layout = "side" }: Props) {
           layout="vertical"
           align="right"
           verticalAlign="middle"
-          formatter={(value: string, entry) => {
+          formatter={(value: string) => {
             const item = data.find((d) => d.name === value);
             return (
               <span style={{ fontSize: 21, fontWeight: 700, opacity: item?.slug ? 1 : 0.6 }}>
