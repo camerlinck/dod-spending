@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { ObjectClassDonut } from "@/components/charts/ObjectClassDonut";
 import { getUSASpending, DOD_AGENCY_CODE } from "@/lib/usaspending/client";
 import { ObjectClassResponse } from "@/lib/usaspending/types";
@@ -126,8 +125,8 @@ export default async function CategoriesPage({ searchParams }: { searchParams: P
           <p>
             <strong>Drillable categories</strong> (Equipment, Supplies, R&D, Services, O&amp;M) represent
             contract spending. Each contract has a Product &amp; Service Code (PSC) that identifies what was
-            purchased — from "Aircraft, Fixed Wing" to "Guided Missiles" to "Managed Healthcare." Click
-            "PSC breakdown" to explore.
+            purchased — from &ldquo;Aircraft, Fixed Wing&rdquo; to &ldquo;Guided Missiles&rdquo; to &ldquo;Managed Healthcare.&rdquo; Click
+            &ldquo;PSC breakdown&rdquo; to explore.
           </p>
           <p>
             <strong>Direct spending categories</strong> (Benefits for Former Personnel, Military Personnel

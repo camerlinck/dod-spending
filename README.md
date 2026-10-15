@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DoD Spending Explorer
 
-## Getting Started
+A Next.js app for exploring U.S. Department of Defense spending, using public data from the [USASpending.gov API](https://api.usaspending.gov/).
 
-First, run the development server:
+## Pages
+
+| Route | What it shows |
+| --- | --- |
+| `/` | Dashboard: headline budget figures, multi-year trend, sub-agency breakdown |
+| `/budget` | Historical budget authority, obligations and outlays by fiscal year |
+| `/spending` | Spending breakdown for the selected fiscal year |
+| `/agencies` | Spending by DoD sub-agency |
+| `/accounts` | Spending by federal account |
+| `/categories` | Spending by object class, drilling into Product & Service Codes (PSC) and contracts |
+| `/geography` | Spending by place of performance |
+| `/search` | Contract award search |
+
+Most pages take an `?fy=` query parameter, set from the fiscal year selector in the header.
+
+## Fiscal years
+
+Federal fiscal year N runs from Oct 1 of N-1 through Sep 30 of N. `lib/fiscal-year.ts` works out the current FY from today's date, so the selector rolls over on its own each October. The default view is the most recent completed FY. The year in progress is flagged because its data is partial. Right after Oct 1, USASpending may return the new FY with `null` amounts, and the UI shows those as "—".
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
+npm test        # unit tests (Vitest)
+npm run lint
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+No API key is needed. USASpending responses are cached through Next.js `revalidate`, which is one hour by default and longer for historical data.
