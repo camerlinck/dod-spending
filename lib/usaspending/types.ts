@@ -1,8 +1,9 @@
 export interface BudgetaryResources {
   fiscal_year: number;
-  agency_budgetary_resources: number;
-  agency_total_obligated: number;
-  agency_total_outlayed: number;
+  // null for a fiscal year that has just started and has no reported data yet
+  agency_budgetary_resources: number | null;
+  agency_total_obligated: number | null;
+  agency_total_outlayed: number | null;
   total_budgetary_resources: number;
 }
 
@@ -14,7 +15,7 @@ export interface AgencyBudgetaryResourcesResponse {
 
 export interface SubAgency {
   name: string;
-  abbreviation: string;
+  abbreviation: string | null;
   total_obligations: number;
   transaction_obligated_amount: number;
   new_award_count: number;

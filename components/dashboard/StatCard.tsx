@@ -5,7 +5,7 @@ import { formatCurrency } from "@/lib/usaspending/formatters";
 
 interface StatCardProps {
   title: string;
-  amount: number;
+  amount: number | null;
   delta?: number;
   subtitle?: string;
 }
